@@ -18,10 +18,16 @@ pipeline {
             steps {
                 sh 'mvn test -B -ntp'
             }
+            post{
+                success{
+                    jacoco()
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
         }
         stage('Package') {
             steps {
-                sh 'mvn package -B -ntp'
+                sh 'mvn package -DskipTests -B -ntp'
             }
         }
     }
