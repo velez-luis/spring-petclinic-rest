@@ -3,16 +3,25 @@ pipeline {
     tools{
         maven 'maven_3.8.8'
     }
-
     stages {
-        stage('Checkout') {
+        // stage('Checkout') {
+        //     steps {
+        //         git branch: 'main', url: 'https://github.com/velez-dev/spring-petclinic-rest'
+        //     }
+        // }
+        stage('Compile') {
             steps {
-                git branch: 'main', url: 'https://github.com/velez-dev/spring-petclinic-rest'
+                sh 'mvn clean compile -B -ntp'
             }
         }
-        stage('Build') {
+        stage('Test') {
             steps {
-                sh 'mvn clean package -DSkipTest -B -ntp'
+                sh 'mvn test -B -ntp'
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'mvn package -B -ntp'
             }
         }
     }
