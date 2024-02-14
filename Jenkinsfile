@@ -9,6 +9,7 @@ pipeline {
         //         git branch: 'main', url: 'https://github.com/velez-dev/spring-petclinic-rest'
         //     }
         // }
+        /*
         stage('Compile') {
             steps {
                 sh 'mvn clean compile -B -ntp'
@@ -24,10 +25,10 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
+        }*/
         stage('Package') {
             steps {
-                sh 'mvn package -DskipTests -B -ntp'
+                sh 'mvn clean package -DskipTests -B -ntp'
             }
         }/*
         stage('Sonarqube') {
@@ -63,7 +64,7 @@ pipeline {
                     server.publishBuildInfo buildInfo
                 }
             }
-        }*/
+        }
         stage('Artifactory') {
             steps {                
                 script{
@@ -92,6 +93,28 @@ pipeline {
                         }
                     """
                     server.upload spec: uploadSpec
+                }
+            }
+        }*/
+        stage('Nexus') {
+            steps {
+                script {
+
+                    sh 'env | sort'
+
+                    def pom = readMavenPom file: 'pom.xml'
+                    println pom
+
+                    nexusPublisher nexusInstanceId: 'sonatype-nexus',
+                    nexusRepositoryId: 'spring-petclinic-rest-release',
+                    packages: [[$class: 'MavenPackage',
+                    mavenAssetList: [[classifier: '', extension: '', filePath: "target/${pom.artifactId}-${pom.version}.jar"]],
+                    mavenCoordinate: [
+                    groupId: "${pom.groupId}",
+                    artifactId: "${pom.artifactId}",
+                    packaging: 'jar',
+                    version: "${pom.version}-${BUILD_NUMBER}"]]]
+
                 }
             }
         }
