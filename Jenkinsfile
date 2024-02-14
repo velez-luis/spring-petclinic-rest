@@ -95,7 +95,7 @@ pipeline {
                     server.upload spec: uploadSpec
                 }
             }
-        }*/
+        }
         stage('Nexus') {
             steps {
                 script {
@@ -115,6 +115,19 @@ pipeline {
                     packaging: 'jar',
                     version: "${pom.version}-${BUILD_NUMBER}"]]]
 
+                }
+            }
+        }*/
+        stage('DockerHub') {
+            steps {
+                script {
+                    def pom = readMavenPom file: 'pom.xml'
+                    def app = docker.build("velezluis/${pom.artifactId}:${pom.version}")
+
+                    docker.withRegistry('https://registry.hub.docker.com/', 'dockerhub-credentials	'){
+                        app.push()
+                        app.push('latest')
+                    }
                 }
             }
         }
