@@ -30,6 +30,14 @@ pipeline {
                 sh 'mvn package -DskipTests -B -ntp'
             }
         }
+        stage('Sonarqube') {
+            steps {
+                withSonarQubeEnv('SonarQubeInstance'){
+                    sh 'mvn sonar:sonar -B -ntp'
+                }
+                
+            }
+        }
     }
     post{
         always{
