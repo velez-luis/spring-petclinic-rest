@@ -69,6 +69,10 @@ pipeline {
                 script{
                     // Forma 2 - File Spec
                     sh 'env | sort'
+
+                    def pom = readMavenPom file: 'pom.xml'
+                    println pom
+
                     def server = Artifactory.server 'artifactory'
                     def repository = 'spring-petclinic-rest'
                     if("${GIT_BRANCH}" == 'origin/main'){
@@ -81,7 +85,7 @@ pipeline {
                             "files": [
                                 {
                                     "pattern": "target/.*.jar",
-                                    "target": "${repository}/com/col/microservices/${BUILD_NUMBER}/",
+                                    "target": "${repository}/${pom.groupId}/${pom.artifactId}/${pom.version}",
                                     "regexp": "true"
                                 }
                             ]
