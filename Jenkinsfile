@@ -71,7 +71,7 @@ pipeline {
                     sh 'env | sort'
                     def server = Artifactory.server 'artifactory'
                     def repository = 'spring-petclinic-rest'
-                    if("${GIT_BRANCH}" == 'origin/master'){
+                    if("${GIT_BRANCH}" == 'origin/main'){
                         repository = repository + '-release'
                     } else {
                         repository = repository + '-snapshot'
@@ -81,7 +81,7 @@ pipeline {
                             "files": [
                                 {
                                     "pattern": "target/.*.jar",
-                                    "target": "${repository}",
+                                    "target": "${repository}/com/col/microservices/${BUILD_NUMBER}/",
                                     "regexp": "true"
                                 }
                             ]
