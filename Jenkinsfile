@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh 'mvn package -DskipTests -B -ntp'
             }
-        }
+        }/*
         stage('Sonarqube') {
             steps {
                 withSonarQubeEnv('SonarQubeInstance'){
@@ -61,6 +61,33 @@ pipeline {
                     def buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean package -B -ntp -DskipTests'
 
                     server.publishBuildInfo buildInfo
+                }
+            }
+        }*/
+        stage('Artifactory') {
+            steps {                
+                script{
+                    // Forma 2 - File Spec
+                    sh 'env | sort'
+                    def server = Artifactory.server 'artifactory'
+                    def repository = 'spring-petclinic-rest'
+                    if("${GIT_BRANCH}" == 'origin/master'){
+                        repository = repository + '-release'
+                    } else {
+                        repository = repository + '-snapshot'
+                    }
+                    def uploadSpec = """
+                        {
+                            "files": [
+                                {
+                                    "pattern": "target/.*.jar",
+                                    "target": "${repository}",
+                                    "regexp": "true"
+                                }
+                            ]
+                        }
+                    """
+                    server.upload spec: uploadSpec
                 }
             }
         }
